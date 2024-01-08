@@ -1,0 +1,51 @@
+.container{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-image: url("../../images/bg.jpg");
+    background-size: cover;
+}
+
+.login_box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 50%;
+    width: 35%;
+    min-height: 500px;
+    min-width: 600px;
+    border: 2px transparent solid;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.link_box{
+    text-align: center;
+    height: 200px;
+    width: 100%;
+}
+
+.underline{
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/*   
+  .login_message{
+    margin-bottom: 60px;
+    font-size: 20px;
+  } */
+
+  .logo{
+    position: relative;
+    left: 20px;
+    width: 100px;
+  }
+
+  .register{
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8)
+  }
