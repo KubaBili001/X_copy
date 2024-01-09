@@ -1,3 +1,4 @@
 node_modules
+database
 .husky/commit-msg
 commitlint.config.js

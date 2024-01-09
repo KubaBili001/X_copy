@@ -7,12 +7,19 @@ export default function Form(): ReactElement{
 
     const validate = () => {
 
-        // const requestOptions = {
-        //     method: 'POST',
-        // };
-        fetch('https://jsonplaceholder.typicode.com/users')
+        const requestOptions = {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        };
+        fetch('http://localhost:3001/signin', requestOptions)
             .then(response => response.json())
-            .then(data => console.log(data))
+            .then(data => alert(data))
     }
 
     return(
