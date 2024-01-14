@@ -4,10 +4,12 @@ import User from './models/User';
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const bodyParser = require('body-parser')
+const jwt = require("jsonwebtoken");
 const express = require('express')
 const bcrypt = require('bcryptjs')
 const cors = require('cors')
 const fs = require('fs').promises;
+require('dotenv').config()
 
 // PORT NUMBER
 const port: number = 3001
@@ -24,7 +26,6 @@ const getConn = async () => {
         throw err;
     }
 };
-
 
 // Assign database string using promise
 getConn()
@@ -61,33 +62,44 @@ app.post('/signin', (req: Request, res: Response) => {
 
             const database = client.db("tin_project");
             const users = database.collection("user");
-            
             const query = { username: username };
-            
             const user = (await users.findOne(query)) as User;
 
             if(!user){
-                return false
+                return {
+                    message: "User name is not found. Invalid login credentials.",
+                    success: false, 
+                } as ApiResponse
             }
 
             if(!(await bcrypt.compare(password, user.password))){
-                return false
+                return {
+                    message: "Incorrect password",
+                    success: false, 
+                } as ApiResponse
             }
-
-            return true
+        
+            return {
+                token: jwt.sign(
+                    {
+                        role: user.role,
+                        name: user.name,
+                        email: user.email,
+                    },
+                        process.env.APP_SECRET,
+                    { expiresIn: "1 day" }
+                    ),
+                message: "Correct password",
+                success: true, 
+            } as ApiResponse
 
         } finally {
             await client.close();
         }
     }
     validate()
-        .then(result => {
-            console.log(result)
-            res.send(result)
-        }
-            )
+        .then(result => { res.send(result) })
         .catch(console.dir) 
-
 })
 
 app.post('/register', (req: Request, res: Response) => {
@@ -98,24 +110,16 @@ app.listen(port, () => {
     console.log(`app is running on port ${port}`)
 })
 
-// Function validating users password
-function validateHash(hash: string){
-    bcrypt
-        .compare('kubabili', hash)
-        .then((res: boolean) => {
-            if(res){
-                console.log(true)
-            }else{
-                console.log(false)
-            }
-        })
-        .catch((err: Error) => console.log(err.message))
-}    
-
 // TYPES
 
 type Login = {
     username: string,
     password: string
+}
+
+type ApiResponse = {
+    token: string,
+    message: string,
+    success: boolean, 
 }
 

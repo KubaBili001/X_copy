@@ -6,7 +6,6 @@ export default function Form(): ReactElement{
     const [password, setPassword] = useState<string>('')
 
     const validate = () => {
-
         const requestOptions = {
             method: 'POST',
             headers: { 
@@ -19,9 +18,10 @@ export default function Form(): ReactElement{
         };
         fetch('http://localhost:3001/signin', requestOptions)
             .then(response => response.json())
-            .then(data => alert(data))
+            .then(data => alert(data.token))
     }
 
+    
     return(
         <div className="elements">
             <div className="input_container">

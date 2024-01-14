@@ -38,10 +38,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var _a = require('mongodb'), MongoClient = _a.MongoClient, ServerApiVersion = _a.ServerApiVersion;
 var bodyParser = require('body-parser');
+var jwt = require("jsonwebtoken");
 var express = require('express');
 var bcrypt = require('bcryptjs');
 var cors = require('cors');
 var fs = require('fs').promises;
+require('dotenv').config();
 // PORT NUMBER
 var port = 3001;
 var client;
@@ -77,7 +79,6 @@ getConn()
     });
 })
     .catch(function (err) { return console.error(err); });
-console.log("check");
 // Create server
 var app = express();
 app.use(bodyParser.json());
@@ -101,22 +102,34 @@ app.post('/signin', function (req, res) {
                     case 1:
                         _a.sent();
                         database = client.db("tin_project");
-                        users = database.collection("users");
+                        users = database.collection("user");
                         query = { username: username };
                         return [4 /*yield*/, users.findOne(query)];
                     case 2:
-                        user = _a.sent();
+                        user = (_a.sent());
                         if (!user) {
-                            return [2 /*return*/, false];
+                            return [2 /*return*/, {
+                                    message: "User name is not found. Invalid login credentials.",
+                                    success: false,
+                                }];
                         }
-                        console.log("check1");
                         return [4 /*yield*/, bcrypt.compare(password, user.password)];
                     case 3:
                         if (!(_a.sent())) {
-                            return [2 /*return*/, false];
+                            return [2 /*return*/, {
+                                    message: "Incorrect password",
+                                    success: false,
+                                }];
                         }
-                        console.log("check2");
-                        return [2 /*return*/, true];
+                        return [2 /*return*/, {
+                                token: jwt.sign({
+                                    role: user.role,
+                                    name: user.name,
+                                    email: user.email,
+                                }, process.env.APP_SECRET, { expiresIn: "1 day" }),
+                                message: "Correct password",
+                                success: true,
+                            }];
                     case 4: return [4 /*yield*/, client.close()];
                     case 5:
                         _a.sent();
@@ -127,7 +140,7 @@ app.post('/signin', function (req, res) {
         });
     };
     validate()
-        .then(function (result) { return res.send(result); })
+        .then(function (result) { res.send(result); })
         .catch(console.dir);
 });
 app.post('/register', function (req, res) {
@@ -149,9 +162,3 @@ function validateHash(hash) {
     })
         .catch(function (err) { return console.log(err.message); });
 }
-// bcrypt
-//     .hash('kubabili', 10)
-//     .then((hash: string) => {
-//         console.log(hash)
-//         validateHash(hash);
-//     })
