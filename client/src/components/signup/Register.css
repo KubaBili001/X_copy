@@ -1,0 +1,147 @@
+@font-face {
+    font-family: 'POPPINS FONT';
+    font-style: normal;
+    font-weight: normal;
+    src: local('POPPINS FONT'), url('../../fonts/Poppins-Light.ttf') format('truetype');
+}
+
+html{
+    font-family: 'POPPINS FONT';
+    font-weight: 200;
+}
+
+body{
+    margin: 0;
+    background-image: url("../../images/bg.jpg");
+    background-size: cover;
+}
+
+.container{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.login_box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 15%;
+    height: 70%;
+    width: 35%;
+    min-height: 500px;
+    min-width: 600px;
+    border: 2px transparent solid;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.link_box{
+    text-align: center;
+    height: 200px;
+    width: 100%;
+}
+
+.underline{
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.input_container {
+    position: relative;
+    margin: 30px 0px 30px 0px;
+    width: 300px;
+  }
+  
+  .input_container input {
+    font-family: 'POPPINS FONT';
+    font-size: 15px;
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.45);
+    padding: 5px 0;
+    background-color: transparent;
+    outline: none;
+  }
+  
+  .input_container .label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #333;
+    transition: all 0.5s ease;
+    pointer-events: none;
+    font-size: 15px;
+  }
+  
+  .input_container input:focus ~ .label,
+  .input_container input:valid ~ .label{
+    top: -20px;
+    font-size: 14px;
+    color: transparent;
+  }
+
+  .input_container .line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    transform: scaleX(0);
+    transition: all 0.3s ease;
+  }
+  
+  .input_container input:focus ~ .line,
+  .input_container input:valid ~ .line {
+    transform: scaleX(1);
+  }
+
+  .login_box .button{
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: black;
+    cursor: pointer;
+    display: flex;
+    font-family: "POPPINS FONT";
+    border-radius: 5px;
+    outline: 0;
+    border: 0;
+    padding: 1rem;
+    margin: 60px 0px 30px 0px;
+    height: 50px;
+    width: 300px;
+    transition: all 0.3s ease;
+    font-size: 15px;
+    text-align: center;
+  }
+
+  .login_box .button:hover{
+   background-color: rgba(0, 0, 0, 0.7);
+   color: rgba(255, 255, 255, 0.8);
+  }
+
+  .elements{
+    position: relative;
+    top: 0px;
+    text-align: center;
+  }
+/*   
+  .login_message{
+    margin-bottom: 60px;
+    font-size: 20px;
+  } */
+
+  .logo{
+    position: relative;
+    left: 20px;
+    width: 100px;
+  }
+
+  .register{
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8)
+  }

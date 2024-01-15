@@ -148,17 +148,3 @@ app.post('/register', function (req, res) {
 app.listen(port, function () {
     console.log("app is running on port ".concat(port));
 });
-// Function validating users password
-function validateHash(hash) {
-    bcrypt
-        .compare('kubabili', hash)
-        .then(function (res) {
-        if (res) {
-            console.log(true);
-        }
-        else {
-            console.log(false);
-        }
-    })
-        .catch(function (err) { return console.log(err.message); });
-}
