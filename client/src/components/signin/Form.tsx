@@ -41,16 +41,18 @@ export default function Form(): ReactElement{
         }
     }
 
-    
     return (
         <div className="elements">
             <Input 
+            label="Username"
             value={username}
             setValue={setUsername} 
             />
             <Input 
+            label="Password"
             value={password}
             setValue={setPassword} 
+            type="password"
             />
             <button className="button" onClick={validate}>Login</button>
         </div>

@@ -1,14 +1,9 @@
 import React, { ReactElement } from "react";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
 import Form from './Form'
 import './Login.css'
 
 export default function Login(): ReactElement {
-
-    const StyledLink = styled(Link)`
-    text-decoration: none;
-    `;
 
     return(
         <div className="container">

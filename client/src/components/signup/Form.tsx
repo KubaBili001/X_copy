@@ -1,4 +1,7 @@
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
+import Input from "../input_field/Input";
+import ApiResponse from "../../models/ApiResponse";
+import { useNavigate } from "react-router";
 
 export default function Register(): ReactElement {
     const [name, setName] = useState<string>('')
@@ -6,55 +9,84 @@ export default function Register(): ReactElement {
     const [email, setEmail] = useState<string>('')
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
-    const [date, setDate] = useState<string>()
+    const [date, setDate] = useState<string>('')
+
+    const navigate = useNavigate()
 
     const validate = () => {
+        //Add password and email validation !!!
+        send()
+    }
+
+    useEffect(() => {
+        console.log(date)
+    }, [date])
+
+    const send = () => {        
         const requestOptions = {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
+                name: name,
+                lastName: lastName,
+                email: email,
                 username: username,
-                password: password
+                password: password,
+                date: date
             })
         };
-        fetch('http://localhost:3001/signin', requestOptions)
+        fetch('http://localhost:3001/signup', requestOptions)
             .then(response => response.json())
-            .then(data => console.log(data))
+            .then(data => process(data))
+    }
+
+    const process = (data: ApiResponse) => {
+        if (!data.success)
+        {
+            alert(data.message)
+        } 
+        else 
+        {
+            navigate("/")
+        }
     }
 
     return (
         <div className="elements">
-            <div className="input_container">
-                <input type="text" id="name_input" name="name" value={name} onChange={e => setName(e.target.value)} autoComplete="false" required />
-                <label htmlFor="name_input" className="label">First name</label>
-                <div className="line"></div>
-            </div>
-            <div className="input_container">
-                <input type="text" id="last_name_input" name="lastName" value={lastName} onChange={e => setLastName(e.target.value)} autoComplete="false" required />
-                <label htmlFor="last_name_input" className="label">Last Name</label>
-                <div className="line"></div>
-            </div>
-            <div className="input_container">
-                <input type="email" id="email_input" name="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="false" required />
-                <label htmlFor="email_input" className="label">Email</label>
-                <div className="line"></div>
-            </div>
-            <div className="input_container">
-                <input type="text" id="username_input" name="username" value={username} onChange={e => setUsername(e.target.value)} autoComplete="false" required />
-                <label htmlFor="username_input" className="label">Username</label>
-                <div className="line"></div>
-            </div>
-            <div className="input_container">
-                <input type="password" id="password_input" name="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="false" required />
-                <label htmlFor="password_input" className="label">Password</label>
-                <div className="line"></div>
-            </div>
-            <div className="input_container">
-                <input type="date" id="input" name="date" value={date} onChange={e => setDate(e.target.value)} autoComplete="false" required />
-                <div className="line"></div>
-            </div>
+            <Input 
+            label="Name"
+            value={name}
+            setValue={setName} 
+            />
+            <Input 
+            label="Last name"
+            value={lastName}
+            setValue={setLastName} 
+            />
+            <Input 
+            label="Email"
+            value={email}
+            setValue={setEmail} 
+            />
+            <Input 
+            label="Username"
+            value={username}
+            setValue={setUsername} 
+            />
+            <Input 
+            label="Password"
+            value={password}
+            setValue={setPassword} 
+            type="password"
+            />
+            <Input 
+            label=""
+            value={date}
+            setValue={setDate} 
+            type="date"
+            />
             <button className="button" onClick={validate} >Register</button>
         </div>
     )

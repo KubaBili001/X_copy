@@ -54,7 +54,6 @@ app.get('/', (req: Request, res: Response) => {
 app.post('/signin', (req: Request, res: Response) => {
     console.log("/signin")
     const { username, password }: Login = req.body;
-    console.log(username, password)
 
     const validate = async function () {
         try {
@@ -102,8 +101,53 @@ app.post('/signin', (req: Request, res: Response) => {
         .catch(console.dir) 
 })
 
-app.post('/register', (req: Request, res: Response) => {
+app.post('/signup', (req: Request, res: Response) => {
+    console.log("/signup")
 
+    const { name, lastName, email, username, password, date }: Register = req.body;
+
+    console.log(date)
+
+    const validate = async function () {
+        try {
+            await client.connect();
+
+            const database = client.db("tin_project");
+            const users = database.collection("user");
+            const salt = bcrypt.genSaltSync(10);
+            const hash = bcrypt.hashSync(password, salt);
+
+            const obj = { 
+                username: username,
+                email: email,
+                password: hash,
+                role: "user",
+                name: name,
+                last_name: lastName,
+                birth_date: date,
+                join_date: new Date() 
+             };
+
+             const result = await users.insertOne(obj); 
+
+             console.log(`A document was inserted with the _id: ${result.insertedId}`);
+
+            return {
+                message: "User added.",
+                success: true, 
+            } as ApiResponse
+        } catch (exc) {
+            return {
+                message: exc,
+                success: false, 
+            } as ApiResponse
+        } finally {
+            await client.close();
+        }
+    }
+    validate()
+        .then(result => { res.send(result) })
+        .catch(console.dir) 
 })
 
 app.listen(port, () => {
@@ -115,6 +159,18 @@ app.listen(port, () => {
 type Login = {
     username: string,
     password: string
+}
+
+type Register = {
+    username: string,
+    email: string,
+    password: string,
+    role: string,
+    name: string,
+    lastName: string,
+    date: string,
+    joinDate: string
+
 }
 
 type ApiResponse = {
