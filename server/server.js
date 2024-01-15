@@ -90,7 +90,6 @@ app.get('/', function (req, res) {
 app.post('/signin', function (req, res) {
     console.log("/signin");
     var _a = req.body, username = _a.username, password = _a.password;
-    console.log(username, password);
     var validate = function () {
         return __awaiter(this, void 0, void 0, function () {
             var database, users, query, user;
@@ -143,7 +142,60 @@ app.post('/signin', function (req, res) {
         .then(function (result) { res.send(result); })
         .catch(console.dir);
 });
-app.post('/register', function (req, res) {
+app.post('/signup', function (req, res) {
+    console.log("/signup");
+    var _a = req.body, name = _a.name, lastName = _a.lastName, email = _a.email, username = _a.username, password = _a.password, date = _a.date;
+    console.log(date);
+    var validate = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var database, users, salt, hash, obj, result, exc_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, 4, 6]);
+                        return [4 /*yield*/, client.connect()];
+                    case 1:
+                        _a.sent();
+                        database = client.db("tin_project");
+                        users = database.collection("user");
+                        salt = bcrypt.genSaltSync(10);
+                        hash = bcrypt.hashSync(password, salt);
+                        obj = {
+                            username: username,
+                            email: email,
+                            password: hash,
+                            role: "user",
+                            name: name,
+                            last_name: lastName,
+                            birth_date: date,
+                            join_date: new Date()
+                        };
+                        return [4 /*yield*/, users.insertOne(obj)];
+                    case 2:
+                        result = _a.sent();
+                        console.log("A document was inserted with the _id: ".concat(result.insertedId));
+                        return [2 /*return*/, {
+                                message: "User added.",
+                                success: true,
+                            }];
+                    case 3:
+                        exc_1 = _a.sent();
+                        return [2 /*return*/, {
+                                message: exc_1,
+                                success: false,
+                            }];
+                    case 4: return [4 /*yield*/, client.close()];
+                    case 5:
+                        _a.sent();
+                        return [7 /*endfinally*/];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    validate()
+        .then(function (result) { res.send(result); })
+        .catch(console.dir);
 });
 app.listen(port, function () {
     console.log("app is running on port ".concat(port));

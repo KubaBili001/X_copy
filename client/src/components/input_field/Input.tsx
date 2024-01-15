@@ -1,11 +1,11 @@
-import React from "react";
+import './Input.css'
 
-export default function Input ( {value , setValue} : {value: string, setValue: Function}) {
+export default function Input ( {label, value , setValue, type = 'text'} : {label: string, value: string, setValue: Function, type?: string}) {
     return (
         <div className="input_container">
-                <input type="text" id="login_input" name={value} value={value} onChange={e => setValue(e.target.value)} required/>
-                <label htmlFor="login_input" className="label">Username</label>
-                <div className="line"></div>
-            </div>
+            <input type={type} id="input" name={value} value={value} onChange={e => setValue(e.target.value.trim())} required/>
+            <label htmlFor="input" className="label">{label}</label>
+            <div className="line"></div>
+        </div>
     )
 }
