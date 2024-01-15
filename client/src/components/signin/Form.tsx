@@ -1,9 +1,15 @@
 import React, { ReactElement, useState } from "react";
+import ApiResponse from '../../models/ApiResponse'
+import { useNavigate } from 'react-router-dom';
+import Input from "../input_field/Input";
 import './Form.css'
+import Cookies from 'js-cookie';
 
 export default function Form(): ReactElement{
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
+
+    const navigate = useNavigate();
 
     const validate = () => {
         const requestOptions = {
@@ -18,22 +24,34 @@ export default function Form(): ReactElement{
         };
         fetch('http://localhost:3001/signin', requestOptions)
             .then(response => response.json())
-            .then(data => alert(data.token))
+            .then(data => process(data))
+    }
+
+    const process = (data: ApiResponse) => {
+        if (!data.success)
+        {
+            alert(data.message)
+        } 
+        else 
+        {
+            const token: string = data.token;
+            Cookies.set('token', token, { expires: 1, secure: false });        
+
+            navigate("/app")
+        }
     }
 
     
-    return(
+    return (
         <div className="elements">
-            <div className="input_container">
-                <input type="text" id="login_input" name="username" value={username} onChange={e => setUsername(e.target.value)} required/>
-                <label htmlFor="login_input" className="label">Username</label>
-                <div className="line"></div>
-            </div>
-            <div className="input_container">
-                <input type="password" id="password_input" name="password" value={password} onChange={e => setPassword(e.target.value)} required/>
-                <label htmlFor="password_input" className="label">Password</label>
-                <div className="line"></div>
-            </div>
+            <Input 
+            value={username}
+            setValue={setUsername} 
+            />
+            <Input 
+            value={password}
+            setValue={setPassword} 
+            />
             <button className="button" onClick={validate}>Login</button>
         </div>
     )
