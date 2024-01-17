@@ -120,6 +120,7 @@ app.post('/signin', function (req, res) {
                                     success: false,
                                 }];
                         }
+                        console.log(user._id.toString());
                         return [2 /*return*/, {
                                 token: jwt.sign({
                                     role: user.role,
@@ -128,6 +129,7 @@ app.post('/signin', function (req, res) {
                                 }, process.env.APP_SECRET, { expiresIn: "1 day" }),
                                 message: "Correct password",
                                 success: true,
+                                id: user._id.toString()
                             }];
                     case 4: return [4 /*yield*/, client.close()];
                     case 5:

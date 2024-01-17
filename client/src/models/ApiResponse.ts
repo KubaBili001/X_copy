@@ -1,3 +1,3 @@
 export default class ApiResponse {
-    constructor(public token: string, public message: string, public success: boolean) {}
+    constructor(public token: string, public message: string, public success: boolean, public id: string) {}
 }

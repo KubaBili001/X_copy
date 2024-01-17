@@ -78,6 +78,8 @@ app.post('/signin', (req: Request, res: Response) => {
                 } as ApiResponse
             }
         
+            console.log(user._id.toString())
+
             return {
                 token: jwt.sign(
                     {
@@ -89,7 +91,8 @@ app.post('/signin', (req: Request, res: Response) => {
                     { expiresIn: "1 day" }
                     ),
                 message: "Correct password",
-                success: true, 
+                success: true,
+                id: user._id.toString()
             } as ApiResponse
 
         } finally {
@@ -150,6 +153,36 @@ app.post('/signup', (req: Request, res: Response) => {
         .catch(console.dir) 
 })
 
+app.get('/posts', () => {
+    const getPostsForFollowedUsers = async (userId: mongoDB.ObjectId): Promise<Post[]> => {
+        try {
+          await client.connect();
+      
+          const followersCollection: mongoDB.Collection<Follower> = client.db().collection<Follower>('followers');
+      
+          const result = await followersCollection.aggregate([
+            { $match: { follower_id: userId } },
+            { $lookup: { from: 'posts', localField: 'user_id', foreignField: 'user_id', as: 'userPosts' } },
+            { $unwind: '$userPosts' },
+            { $sort: { 'userPosts.date': 1 } },
+            { $limit: 20 },
+            { $project: { userPosts: 1, _id: 0 } },
+          ]).toArray();
+      
+          return result.map((entry) => entry.userPosts);
+        } finally {
+          await client.close();
+        }
+      }
+      getPostsForFollowedUsers(userId)
+      .then((posts) => {
+        console.log(posts);
+      })
+      .catch((error) => {
+        console.error(error);
+      });  
+})
+
 app.listen(port, () => {
     console.log(`app is running on port ${port}`)
 })
@@ -170,11 +203,23 @@ type Register = {
     lastName: string,
     date: string,
     joinDate: string
+}
 
+type Follower = {
+    id: mongoDB.ObjectId;
+    user_id: mongoDB.ObjectId;
+    follower_id: mongoDB.ObjectId;
+}
+  
+type Post = {
+    user_id: mongoDB.ObjectId;
+    text: string;
+    date: Date;
 }
 
 type ApiResponse = {
-    token: string,
+    token?: string,
+    id?: string,
     message: string,
     success: boolean, 
 }
