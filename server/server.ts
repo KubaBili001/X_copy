@@ -1,5 +1,6 @@
 import { Request, Response} from 'express'
 import * as mongoDB from "mongodb";
+import { ObjectId } from 'mongodb';
 import User from './models/User';
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -78,6 +79,8 @@ app.post('/signin', (req: Request, res: Response) => {
                 } as ApiResponse
             }
         
+            console.log(user._id.toString())
+
             return {
                 token: jwt.sign(
                     {
@@ -89,7 +92,8 @@ app.post('/signin', (req: Request, res: Response) => {
                     { expiresIn: "1 day" }
                     ),
                 message: "Correct password",
-                success: true, 
+                success: true,
+                id: user._id.toString()
             } as ApiResponse
 
         } finally {
@@ -150,6 +154,52 @@ app.post('/signup', (req: Request, res: Response) => {
         .catch(console.dir) 
 })
 
+app.post('/posts', (req: Request, res: Response) => {
+
+    const userId: ObjectId = new ObjectId(req.body.userId)
+    const skip: number = req.body.skip
+
+    const getPostsForFollowedUsers = async function (userId: ObjectId): Promise<ApiPostsResponse[]> {
+        try {
+
+          await client.connect();
+
+          const followersCollection: mongoDB.Collection<Follower> = client.db("tin_project").collection<Follower>('followers');
+      
+          const result = await followersCollection.aggregate([
+            { $match: { follower_id: userId } },
+            { $lookup: { from: 'posts', localField: 'user_id', foreignField: 'user_id', as: 'userPosts' } },
+            { $lookup: { from: "user", localField: "user_id", foreignField: "_id", as: "users" } },
+            { $unwind: '$userPosts' },
+            { $unwind: '$users' },
+            { $sort: { 'date': 1 } },
+            { $skip: skip },
+            { $limit: 10 },
+            { $project: { "_id": 0, "user_id": 0,  "follower_id": 0 } }
+
+          ]).toArray();
+
+          const res: ApiPostsResponse[] = await result.map((entry) => {
+            return {
+                    content: entry.userPosts.text_content,
+                    image: entry.userPosts.picture,
+                    username: entry.users.username
+            }
+          });
+
+          return res;
+        } finally {
+          await client.close();
+        }
+      }
+
+      getPostsForFollowedUsers(userId)
+      .then(posts => { 
+        res.send(posts) 
+    })
+      .catch(console.dir)
+})
+
 app.listen(port, () => {
     console.log(`app is running on port ${port}`)
 })
@@ -170,11 +220,23 @@ type Register = {
     lastName: string,
     date: string,
     joinDate: string
+}
 
+type Follower = {
+    id: ObjectId;
+    user_id: ObjectId;
+    follower_id: ObjectId;
+}
+
+type ApiPostsResponse = {
+    content: string,
+    image: string,
+    username: string
 }
 
 type ApiResponse = {
-    token: string,
+    token?: string,
+    id?: string,
     message: string,
     success: boolean, 
 }

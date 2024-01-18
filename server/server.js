@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var mongodb_1 = require("mongodb");
 var _a = require('mongodb'), MongoClient = _a.MongoClient, ServerApiVersion = _a.ServerApiVersion;
 var bodyParser = require('body-parser');
 var jwt = require("jsonwebtoken");
@@ -120,6 +121,7 @@ app.post('/signin', function (req, res) {
                                     success: false,
                                 }];
                         }
+                        console.log(user._id.toString());
                         return [2 /*return*/, {
                                 token: jwt.sign({
                                     role: user.role,
@@ -128,6 +130,7 @@ app.post('/signin', function (req, res) {
                                 }, process.env.APP_SECRET, { expiresIn: "1 day" }),
                                 message: "Correct password",
                                 success: true,
+                                id: user._id.toString()
                             }];
                     case 4: return [4 /*yield*/, client.close()];
                     case 5:
@@ -195,6 +198,58 @@ app.post('/signup', function (req, res) {
     };
     validate()
         .then(function (result) { res.send(result); })
+        .catch(console.dir);
+});
+app.post('/posts', function (req, res) {
+    var userId = new mongodb_1.ObjectId(req.body.userId);
+    var skip = req.body.skip;
+    var getPostsForFollowedUsers = function (userId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var followersCollection, result, res_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, , 4, 6]);
+                        return [4 /*yield*/, client.connect()];
+                    case 1:
+                        _a.sent();
+                        followersCollection = client.db("tin_project").collection('followers');
+                        return [4 /*yield*/, followersCollection.aggregate([
+                                { $match: { follower_id: userId } },
+                                { $lookup: { from: 'posts', localField: 'user_id', foreignField: 'user_id', as: 'userPosts' } },
+                                { $lookup: { from: "user", localField: "user_id", foreignField: "_id", as: "users" } },
+                                { $unwind: '$userPosts' },
+                                { $unwind: '$users' },
+                                { $sort: { 'date': 1 } },
+                                { $skip: skip },
+                                { $limit: 10 },
+                                { $project: { "_id": 0, "user_id": 0, "follower_id": 0 } }
+                            ]).toArray()];
+                    case 2:
+                        result = _a.sent();
+                        return [4 /*yield*/, result.map(function (entry) {
+                                return {
+                                    content: entry.userPosts.text_content,
+                                    image: entry.userPosts.picture,
+                                    username: entry.users.username
+                                };
+                            })];
+                    case 3:
+                        res_1 = _a.sent();
+                        return [2 /*return*/, res_1];
+                    case 4: return [4 /*yield*/, client.close()];
+                    case 5:
+                        _a.sent();
+                        return [7 /*endfinally*/];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    getPostsForFollowedUsers(userId)
+        .then(function (posts) {
+        res.send(posts);
+    })
         .catch(console.dir);
 });
 app.listen(port, function () {

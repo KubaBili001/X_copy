@@ -34,8 +34,8 @@ export default function Form(): ReactElement{
         } 
         else 
         {
-            const token: string = data.token;
-            Cookies.set('token', token, { expires: 1, secure: false });        
+            Cookies.set('token', data.token, { expires: 1, secure: false });
+            Cookies.set('userid', data.id, { expires: 1, secure: false });           
 
             navigate("/app")
         }
