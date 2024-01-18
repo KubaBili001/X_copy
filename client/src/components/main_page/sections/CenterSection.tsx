@@ -16,14 +16,17 @@ export default function CenterSection (): ReactElement {
         },
         body: JSON.stringify({
             userId: Cookies.get('userid'),
-            skip: itemCount
+            skip: posts.length
         })
     };
 
     useEffect(() => {
         fetch('http://localhost:3001/posts', requestOptions)
             .then(response => response.json())
-            .then(data => { setPosts(data) })
+            .then(data => { 
+                console.log(data) 
+                setPosts(data)
+            })
     }, [])
 
     const loadPosts = () => {

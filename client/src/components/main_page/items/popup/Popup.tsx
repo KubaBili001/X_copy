@@ -1,5 +1,6 @@
 import { ReactElement } from "react";
 import './Popup.css'
+import React from "react";
 
 export default function Popup ({ handleClose, content} : { handleClose: Function, content: ReactElement}) {
 

@@ -1,12 +1,20 @@
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import Icon from "../items/Icon";
 import Profile from '../../../images/profile.png'
 import Home from '../../../images/home.png'
 import Followers from '../../../images/following.png'
 import LogOut from '../../../images/log out.png'
 import Logo from '../../../images/logow.png'
+import Popup from "../items/popup/Popup";
+import AddPost from "../items/add_post/AddPost";
 
 export default function LeftSection (): ReactElement {
+    const [isOpen, setIsOpen] = useState<boolean>(false)
+
+    const handleClose = () => {
+        setIsOpen(false)
+    }
+
     return (
         <div className="inner_left">
             <div className="left_menu">
@@ -32,7 +40,13 @@ export default function LeftSection (): ReactElement {
                     />
                 </div>
             </div>
-            <button className="add_post">ADD POST</button>
+            <button className="add_post" onClick={() => { setIsOpen(true) }}>ADD POST</button>
+            {
+            isOpen && <Popup 
+                handleClose={handleClose}
+                content={<AddPost handleClose={handleClose}/>}
+            />
+            }
         </div>
     )
 }

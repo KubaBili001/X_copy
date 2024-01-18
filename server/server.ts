@@ -44,7 +44,7 @@ getConn()
 
 // Create server
 const app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 app.use(cors())
 
 app.get('/', (req: Request, res: Response) => {
@@ -56,7 +56,7 @@ app.post('/signin', (req: Request, res: Response) => {
     console.log("/signin")
     const { username, password }: Login = req.body;
 
-    const validate = async function () {
+    const validate = async function (): Promise<ApiResponse> {
         try {
             await client.connect();
 
@@ -156,8 +156,12 @@ app.post('/signup', (req: Request, res: Response) => {
 
 app.post('/posts', (req: Request, res: Response) => {
 
+    console.log('posts')
+
     const userId: ObjectId = new ObjectId(req.body.userId)
     const skip: number = req.body.skip
+
+    console.log(userId)
 
     const getPostsForFollowedUsers = async function (userId: ObjectId): Promise<ApiPostsResponse[]> {
         try {
@@ -187,6 +191,8 @@ app.post('/posts', (req: Request, res: Response) => {
             }
           });
 
+          console.log(res)
+
           return res;
         } finally {
           await client.close();
@@ -197,6 +203,47 @@ app.post('/posts', (req: Request, res: Response) => {
       .then(posts => { 
         res.send(posts) 
     })
+      .catch(console.dir)
+})
+
+app.post('/addPost' , (req: Request, res: Response) => {
+
+    console.log('addPost')
+
+    const {image, content} : {image: string, content: string} = req.body
+    const userId: ObjectId = new ObjectId(req.body.userId)
+
+    const getPostsForFollowedUsers = async function (image: string, content: string, userId: ObjectId): Promise<ApiResponse> {
+        try {
+          await client.connect();
+
+          const posts: mongoDB.Collection<Post> = client.db("tin_project").collection<Post>('posts');
+      
+          const obj: Post = {
+            date: new Date().toString(),
+            user_id: userId,
+            text_content: content,
+            picture: image
+          }
+
+          await posts.insertOne(obj); 
+
+          return {
+            message: "Post succesfully added",
+            success: true, 
+        } as ApiResponse
+        } catch (exc) {
+            return {
+                message: exc,
+                success: false, 
+            } as ApiResponse
+        } finally {
+          await client.close();
+        }
+      }
+
+      getPostsForFollowedUsers(image, content, userId)
+      .then(posts => { res.send(posts) })
       .catch(console.dir)
 })
 
@@ -226,6 +273,14 @@ type Follower = {
     id: ObjectId;
     user_id: ObjectId;
     follower_id: ObjectId;
+}
+
+type Post = {
+    id?: ObjectId,
+    date: string,
+    user_id: ObjectId,
+    text_content: string,
+    picture: string
 }
 
 type ApiPostsResponse = {

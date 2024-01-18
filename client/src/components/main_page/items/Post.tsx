@@ -1,10 +1,9 @@
 import { ReactElement, useState } from "react";
 import Popup from "./popup/Popup";
-import AddPost from "./add_post/AddPost";
 import ProfilePic from '../../../images/profile_pic.png'
 
 export default function Post ( {username, content, image} : {username: string, content: string, image: string} ): ReactElement {
-    const [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState<boolean>(false)
 
     const handleClose = () => {
         setIsOpen(false)

@@ -82,7 +82,7 @@ getConn()
     .catch(function (err) { return console.error(err); });
 // Create server
 var app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cors());
 app.get('/', function (req, res) {
     console.log("/");
@@ -201,8 +201,10 @@ app.post('/signup', function (req, res) {
         .catch(console.dir);
 });
 app.post('/posts', function (req, res) {
+    console.log('posts');
     var userId = new mongodb_1.ObjectId(req.body.userId);
     var skip = req.body.skip;
+    console.log(userId);
     var getPostsForFollowedUsers = function (userId) {
         return __awaiter(this, void 0, void 0, function () {
             var followersCollection, result, res_1;
@@ -236,6 +238,7 @@ app.post('/posts', function (req, res) {
                             })];
                     case 3:
                         res_1 = _a.sent();
+                        console.log(res_1);
                         return [2 /*return*/, res_1];
                     case 4: return [4 /*yield*/, client.close()];
                     case 5:
@@ -250,6 +253,53 @@ app.post('/posts', function (req, res) {
         .then(function (posts) {
         res.send(posts);
     })
+        .catch(console.dir);
+});
+app.post('/addPost', function (req, res) {
+    console.log('addPost');
+    var _a = req.body, image = _a.image, content = _a.content;
+    var userId = new mongodb_1.ObjectId(req.body.userId);
+    var getPostsForFollowedUsers = function (image, content, userId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var posts, obj, exc_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, 4, 6]);
+                        return [4 /*yield*/, client.connect()];
+                    case 1:
+                        _a.sent();
+                        posts = client.db("tin_project").collection('posts');
+                        obj = {
+                            date: new Date().toString(),
+                            user_id: userId,
+                            text_content: content,
+                            picture: image
+                        };
+                        return [4 /*yield*/, posts.insertOne(obj)];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/, {
+                                message: "Post succesfully added",
+                                success: true,
+                            }];
+                    case 3:
+                        exc_2 = _a.sent();
+                        return [2 /*return*/, {
+                                message: exc_2,
+                                success: false,
+                            }];
+                    case 4: return [4 /*yield*/, client.close()];
+                    case 5:
+                        _a.sent();
+                        return [7 /*endfinally*/];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    getPostsForFollowedUsers(image, content, userId)
+        .then(function (posts) { res.send(posts); })
         .catch(console.dir);
 });
 app.listen(port, function () {

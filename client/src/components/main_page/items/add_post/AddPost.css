@@ -1,5 +1,59 @@
 .add-post-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
-    height: 300px;
+
     border-top: 2px #212121 solid;
+}
+
+.text-field {
+    height: 100%;
+    width: 100%;
+    border-bottom: 2px #212121 solid;
+}
+
+.content-input {
+    height: 100%;
+    min-height: 160px;
+    max-height: 160px;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    color: white;
+    resize: none;
+}
+
+.post-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.add-post-button, .add-attachment-button {
+    margin: 10px;
+    background-color: #212121;
+    border: 0px;
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload {
+    cursor: pointer;
+}
+
+.image-preview-container {
+    width: 100%;
+    height: 100%;
+}
+
+.image-preview{
+    max-width: 100%;
+    max-height: 100%;
 }
