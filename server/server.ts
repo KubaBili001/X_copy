@@ -1,5 +1,6 @@
 import { Request, Response} from 'express'
 import * as mongoDB from "mongodb";
+import { ObjectId } from 'mongodb';
 import User from './models/User';
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -153,34 +154,50 @@ app.post('/signup', (req: Request, res: Response) => {
         .catch(console.dir) 
 })
 
-app.get('/posts', () => {
-    const getPostsForFollowedUsers = async (userId: mongoDB.ObjectId): Promise<Post[]> => {
+app.post('/posts', (req: Request, res: Response) => {
+
+    const userId: ObjectId = new ObjectId(req.body.userId)
+    const skip: number = req.body.skip
+
+    const getPostsForFollowedUsers = async function (userId: ObjectId): Promise<ApiPostsResponse[]> {
         try {
+
           await client.connect();
-      
-          const followersCollection: mongoDB.Collection<Follower> = client.db().collection<Follower>('followers');
+
+          const followersCollection: mongoDB.Collection<Follower> = client.db("tin_project").collection<Follower>('followers');
       
           const result = await followersCollection.aggregate([
             { $match: { follower_id: userId } },
             { $lookup: { from: 'posts', localField: 'user_id', foreignField: 'user_id', as: 'userPosts' } },
+            { $lookup: { from: "user", localField: "user_id", foreignField: "_id", as: "users" } },
             { $unwind: '$userPosts' },
-            { $sort: { 'userPosts.date': 1 } },
-            { $limit: 20 },
-            { $project: { userPosts: 1, _id: 0 } },
+            { $unwind: '$users' },
+            { $sort: { 'date': 1 } },
+            { $skip: skip },
+            { $limit: 10 },
+            { $project: { "_id": 0, "user_id": 0,  "follower_id": 0 } }
+
           ]).toArray();
-      
-          return result.map((entry) => entry.userPosts);
+
+          const res: ApiPostsResponse[] = await result.map((entry) => {
+            return {
+                    content: entry.userPosts.text_content,
+                    image: entry.userPosts.picture,
+                    username: entry.users.username
+            }
+          });
+
+          return res;
         } finally {
           await client.close();
         }
       }
+
       getPostsForFollowedUsers(userId)
-      .then((posts) => {
-        console.log(posts);
-      })
-      .catch((error) => {
-        console.error(error);
-      });  
+      .then(posts => { 
+        res.send(posts) 
+    })
+      .catch(console.dir)
 })
 
 app.listen(port, () => {
@@ -206,15 +223,15 @@ type Register = {
 }
 
 type Follower = {
-    id: mongoDB.ObjectId;
-    user_id: mongoDB.ObjectId;
-    follower_id: mongoDB.ObjectId;
+    id: ObjectId;
+    user_id: ObjectId;
+    follower_id: ObjectId;
 }
-  
-type Post = {
-    user_id: mongoDB.ObjectId;
-    text: string;
-    date: Date;
+
+type ApiPostsResponse = {
+    content: string,
+    image: string,
+    username: string
 }
 
 type ApiResponse = {

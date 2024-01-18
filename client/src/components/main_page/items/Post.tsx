@@ -1,23 +1,39 @@
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
+import Popup from "./popup/Popup";
+import AddPost from "./add_post/AddPost";
+import ProfilePic from '../../../images/profile_pic.png'
 
-export default function Post (): ReactElement {
+export default function Post ( {username, content, image} : {username: string, content: string, image: string} ): ReactElement {
+    const [isOpen, setIsOpen] = useState(false)
+
+    const handleClose = () => {
+        setIsOpen(false)
+    }
+
     return (
         <div className="post">
-            <div className="post_profile">
-                <img className="profile_pic" src="profile_pic.png" alt="profile picture"/>
-                <p className="username">KubaBili001</p>
+            <div className="post_profile post-width">
+                <img className="profile_pic" src={ProfilePic} alt="profile picture"/>
+                <p className="username">{username}</p>
                 <button className="follow">follow</button>
             </div>
-            <div className="post_content">
+            <div className="post_content post-width">
                 <div className="post_txt">
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium temporibus ab ipsa provident nostrum eius reiciendis ducimus inventore rerum quod!</p>
+                    <p>{content}</p>
                 </div>
-                <div className="post_img">
-                    <img className="post_picture" src="pic1.jpg" alt="picture"/>
+                <div className="post_img ">
+                    <img className="post_picture" src={image} alt="picture"/>
                 </div>
                 <div className="post_comments">
-                    <h1 className="comments">See all comments</h1>
-                    <img className="like" src="heart.png" alt="like"/>
+                    <button className="comments_button" onClick={() => { setIsOpen(true) }}>
+                        <h1 className="comments">See all comments</h1>  
+                    </button>
+                    {
+                    isOpen && <Popup 
+                        handleClose={handleClose}
+                        content={<></>}
+                    />
+                    }
                 </div>
             </div>
         </div>

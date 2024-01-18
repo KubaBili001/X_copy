@@ -1,10 +1,10 @@
 import { ReactElement } from "react";
 
-export default function Icon (): ReactElement {
+export default function Icon ({ text, image } : { text: string, image: string }): ReactElement {
     return(
-        <a className="icon_container" href="">
-            <img className="icon" src="profile.png" alt="profile"/>
-            <h1 className="icon_text">Profile</h1>
-        </a>
+        <button className="icon_container">
+            <img className="icon" src={image} alt={text}/>
+            <h1 className="icon_text">{text}</h1>
+        </ button>
     )
 }
