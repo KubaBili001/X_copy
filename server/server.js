@@ -238,7 +238,6 @@ app.post('/posts', function (req, res) {
                             })];
                     case 3:
                         res_1 = _a.sent();
-                        console.log(res_1);
                         return [2 /*return*/, res_1];
                     case 4: return [4 /*yield*/, client.close()];
                     case 5:
@@ -259,7 +258,7 @@ app.post('/addPost', function (req, res) {
     console.log('addPost');
     var _a = req.body, image = _a.image, content = _a.content;
     var userId = new mongodb_1.ObjectId(req.body.userId);
-    var getPostsForFollowedUsers = function (image, content, userId) {
+    var addPost = function (image, content, userId) {
         return __awaiter(this, void 0, void 0, function () {
             var posts, obj, exc_2;
             return __generator(this, function (_a) {
@@ -298,7 +297,7 @@ app.post('/addPost', function (req, res) {
             });
         });
     };
-    getPostsForFollowedUsers(image, content, userId)
+    addPost(image, content, userId)
         .then(function (posts) { res.send(posts); })
         .catch(console.dir);
 });

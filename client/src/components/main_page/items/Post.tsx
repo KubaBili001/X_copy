@@ -1,6 +1,7 @@
 import { ReactElement, useState } from "react";
 import Popup from "./popup/Popup";
 import ProfilePic from '../../../images/profile_pic.png'
+import Comments from "./comments/Comments";
 
 export default function Post ( {username, content, image} : {username: string, content: string, image: string} ): ReactElement {
     const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -30,7 +31,7 @@ export default function Post ( {username, content, image} : {username: string, c
                     {
                     isOpen && <Popup 
                         handleClose={handleClose}
-                        content={<></>}
+                        content={<Comments/>}
                     />
                     }
                 </div>

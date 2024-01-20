@@ -191,8 +191,6 @@ app.post('/posts', (req: Request, res: Response) => {
             }
           });
 
-          console.log(res)
-
           return res;
         } finally {
           await client.close();
@@ -213,7 +211,7 @@ app.post('/addPost' , (req: Request, res: Response) => {
     const {image, content} : {image: string, content: string} = req.body
     const userId: ObjectId = new ObjectId(req.body.userId)
 
-    const getPostsForFollowedUsers = async function (image: string, content: string, userId: ObjectId): Promise<ApiResponse> {
+    const addPost = async function (image: string, content: string, userId: ObjectId): Promise<ApiResponse> {
         try {
           await client.connect();
 
@@ -242,7 +240,7 @@ app.post('/addPost' , (req: Request, res: Response) => {
         }
       }
 
-      getPostsForFollowedUsers(image, content, userId)
+      addPost(image, content, userId)
       .then(posts => { res.send(posts) })
       .catch(console.dir)
 })
